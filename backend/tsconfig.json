@@ -10,20 +10,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
     "declaration": false,
     "sourceMap": true,
-    "baseUrl": "./src",
-    "paths": {
-      "@config/*": ["config/*"],
-      "@controllers/*": ["controllers/*"],
-      "@services/*": ["services/*"],
-      "@routes/*": ["routes/*"],
-      "@middlewares/*": ["middlewares/*"],
-      "@validators/*": ["validators/*"],
-      "@utils/*": ["utils/*"],
-      "@types/*": ["types/*"]
-    },
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitAny": true
