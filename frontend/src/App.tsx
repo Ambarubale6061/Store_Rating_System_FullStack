@@ -3,12 +3,13 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import { RoleProtectedRoute } from '@/routes/RoleProtectedRoute';
+import { GuestRoute } from '@/routes/GuestRoute';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { SignupPage } from '@/pages/auth/SignupPage';
-import { RoleRedirect } from '@/pages/RoleRedirect';
+import { HomePage } from '@/pages/HomePage';
 import { ChangePasswordPage } from '@/pages/ChangePasswordPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
@@ -26,18 +27,19 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Public auth routes */}
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
+          <Route element={<GuestRoute />}>
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+            </Route>
           </Route>
+
+          <Route path="/" element={<HomePage />} />
 
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Any authenticated role */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<RoleRedirect />} />
-
             <Route element={<DashboardLayout />}>
               <Route path="/change-password" element={<ChangePasswordPage />} />
 

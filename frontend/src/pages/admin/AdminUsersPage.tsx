@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ColumnDef } from '@tanstack/react-table';
 import toast from 'react-hot-toast';
+import { Plus } from 'lucide-react';
 import { DataTable } from '@/components/tables/DataTable';
 import { SearchBar } from '@/components/common/SearchBar';
 import { Pagination } from '@/components/common/Pagination';
@@ -101,12 +102,18 @@ export function AdminUsersPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-slate-800">Users</h2>
-        <Button onClick={() => setIsModalOpen(true)}>+ Add User</Button>
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900">Users</h2>
+          <p className="mt-1 text-sm text-slate-500">Manage admins, customers, and store owners.</p>
+        </div>
+        <Button onClick={() => setIsModalOpen(true)}>
+          <Plus className="h-4 w-4" />
+          Add User
+        </Button>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-5">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by name, email, or address..." />
       </div>
 

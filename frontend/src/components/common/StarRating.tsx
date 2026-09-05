@@ -1,3 +1,5 @@
+import { Star } from 'lucide-react';
+
 interface StarRatingProps {
   value: number;
   onChange?: (value: number) => void;
@@ -7,10 +9,10 @@ interface StarRatingProps {
 
 export function StarRating({ value, onChange, readOnly = false, size = 'md' }: StarRatingProps) {
   const stars = [1, 2, 3, 4, 5];
-  const textSize = size === 'sm' ? 'text-base' : 'text-2xl';
+  const iconSize = size === 'sm' ? 'h-4 w-4' : 'h-6 w-6';
 
   return (
-    <div className={`flex gap-0.5 ${textSize}`} role={readOnly ? undefined : 'radiogroup'} aria-label="Rating">
+    <div className="flex gap-0.5" role={readOnly ? undefined : 'radiogroup'} aria-label="Rating">
       {stars.map((star) => {
         const filled = star <= Math.round(value);
         return (
@@ -24,7 +26,7 @@ export function StarRating({ value, onChange, readOnly = false, size = 'md' }: S
               filled ? 'text-amber-400' : 'text-slate-300'
             }`}
           >
-            ★
+            <Star className={iconSize} fill={filled ? 'currentColor' : 'none'} />
           </button>
         );
       })}

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import toast from 'react-hot-toast';
+import { Plus } from 'lucide-react';
 import { DataTable } from '@/components/tables/DataTable';
 import { SearchBar } from '@/components/common/SearchBar';
 import { Pagination } from '@/components/common/Pagination';
@@ -111,12 +112,18 @@ export function AdminStoresPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-slate-800">Stores</h2>
-        <Button onClick={openModal}>+ Add Store</Button>
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900">Stores</h2>
+          <p className="mt-1 text-sm text-slate-500">Browse every listed store and its live rating.</p>
+        </div>
+        <Button onClick={openModal}>
+          <Plus className="h-4 w-4" />
+          Add Store
+        </Button>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-5">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by name, email, or address..." />
       </div>
 

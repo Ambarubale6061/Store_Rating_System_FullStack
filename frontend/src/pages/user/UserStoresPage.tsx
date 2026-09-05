@@ -106,9 +106,12 @@ export function UserStoresPage() {
 
   return (
     <div>
-      <h2 className="mb-6 text-xl font-semibold text-slate-800">Browse Stores</h2>
+      <div className="mb-8">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900">Browse Stores</h2>
+        <p className="mt-1 text-sm text-slate-500">Find a store and share your rating.</p>
+      </div>
 
-      <div className="mb-4">
+      <div className="mb-5">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by store name or address..." />
       </div>
 
