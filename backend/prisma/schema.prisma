@@ -46,13 +46,22 @@ model User {
 }
 
 model Store {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  address   String
-  ownerId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  address       String
+  ownerId       String
+  // Extended profile fields for the store detail page. All optional —
+  // a store remains fully valid with none of these set, and existing
+  // rows get NULL / empty-array defaults when this migration runs.
+  phone         String?
+  description   String?
+  businessHours String?
+  logoUrl       String?
+  categories    String[] @default([])
+  services      String[] @default([])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   owner   User     @relation("StoreOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   ratings Rating[]
