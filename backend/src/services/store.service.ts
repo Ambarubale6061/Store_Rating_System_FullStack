@@ -3,11 +3,26 @@ import { prisma } from '../config/prisma';
 import { AppError } from '../utils/AppError';
 import { ParsedPagination } from '../utils/pagination';
 
-export interface CreateStoreInput {
+export interface StoreProfileFields {
+  phone?: string | null;
+  description?: string | null;
+  businessHours?: string | null;
+  logoUrl?: string | null;
+  categories?: string[];
+  services?: string[];
+}
+
+export interface CreateStoreInput extends StoreProfileFields {
   name: string;
   email: string;
   address: string;
   ownerId: string;
+}
+
+export interface UpdateStoreInput extends StoreProfileFields {
+  name?: string;
+  email?: string;
+  address?: string;
 }
 
 export interface ListStoresOptions extends ParsedPagination {
@@ -36,10 +51,25 @@ export async function createStore(input: CreateStoreInput) {
   return prisma.store.create({ data: { ...input } });
 }
 
-/**
- * Computes average rating + rating count for a store using a single
- * aggregate query rather than loading every rating row into memory.
- */
+export async function updateStore(storeId: string, input: UpdateStoreInput) {
+  const existing = await prisma.store.findUnique({ where: { id: storeId } });
+  if (!existing) {
+    throw AppError.notFound('Store not found.');
+  }
+
+  if (input.email && input.email !== existing.email) {
+    const emailTaken = await prisma.store.findUnique({ where: { email: input.email } });
+    if (emailTaken) {
+      throw AppError.conflict('A store with this email already exists.');
+    }
+  }
+
+  await prisma.store.update({ where: { id: storeId }, data: { ...input } });
+
+  return getStoreById(storeId);
+}
+
+
 export async function getStoreRatingStats(storeId: string) {
   const result = await prisma.rating.aggregate({
     where: { storeId },
@@ -65,9 +95,7 @@ export async function listStores(options: ListStoresOptions) {
       }
     : {};
 
-  // averageRating is a computed field, not a real column, so it can't be
-  // sorted at the database level without a raw query — we sort by createdAt
-  // at the DB level for that case and re-sort in memory after aggregating.
+
   const dbSortBy = sortBy === 'averageRating' ? 'createdAt' : sortBy;
 
   const [stores, total] = await prisma.$transaction([
@@ -80,9 +108,6 @@ export async function listStores(options: ListStoresOptions) {
     prisma.store.count({ where }),
   ]);
 
-  // If browsing as a USER, fetch that user's ratings for just these stores
-  // in one extra query, rather than a conditional Prisma `include` (which
-  // types awkwardly when it's toggled on/off based on a runtime value).
   const myRatingsByStoreId = new Map<string, number>();
   if (currentUserId && stores.length > 0) {
     const myRatings = await prisma.rating.findMany({
@@ -103,6 +128,12 @@ export async function listStores(options: ListStoresOptions) {
         email: store.email,
         address: store.address,
         ownerId: store.ownerId,
+        phone: store.phone,
+        description: store.description,
+        businessHours: store.businessHours,
+        logoUrl: store.logoUrl,
+        categories: store.categories,
+        services: store.services,
         createdAt: store.createdAt,
         averageRating: stats.averageRating,
         totalRatings: stats.totalRatings,
