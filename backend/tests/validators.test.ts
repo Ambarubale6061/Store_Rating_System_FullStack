@@ -2,6 +2,7 @@ import express from 'express';
 import request from 'supertest';
 import { signupValidator, loginValidator } from '../src/validators/auth.validator';
 import { submitRatingValidator } from '../src/validators/rating.validator';
+import { createStoreValidator, updateStoreValidator } from '../src/validators/store.validator';
 import { globalErrorHandler } from '../src/middlewares/errorHandler';
 
 function buildTestApp(validators: unknown[]) {
@@ -117,6 +118,103 @@ describe('submitRatingValidator', () => {
 
   it('rejects a non-UUID storeId', async () => {
     const res = await request(app).post('/test').send({ storeId: 'not-a-uuid', rating: 3 });
+    expect(res.status).toBe(400);
+  });
+});
+
+const validStoreBody = {
+  name: 'A Sufficiently Long Test Store Name', // within 20-60
+  email: 'store@example.com',
+  address: '123 Main Street',
+  ownerId: 'a1b2c3d4-e5f6-4a1b-8c2d-3e4f5a6b7c8d',
+};
+
+describe('createStoreValidator — extended profile fields', () => {
+  const app = buildTestApp(createStoreValidator);
+
+  it('accepts a store with no profile fields at all (all optional)', async () => {
+    const res = await request(app).post('/test').send(validStoreBody);
+    expect(res.status).toBe(200);
+  });
+
+  it('accepts a store with valid profile fields', async () => {
+    const res = await request(app)
+      .post('/test')
+      .send({
+        ...validStoreBody,
+        phone: '+1-555-0100',
+        description: 'A cozy neighborhood bakery.',
+        businessHours: 'Mon-Sat: 7am - 6pm',
+        logoUrl: 'https://example.com/logo.png',
+        categories: ['Bakery', 'Cafe'],
+        services: ['Custom Cakes', 'Coffee'],
+      });
+    expect(res.status).toBe(200);
+  });
+
+  it('rejects an invalid phone number', async () => {
+    const res = await request(app).post('/test').send({ ...validStoreBody, phone: 'not-a-phone-number!!' });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a description over 1000 characters', async () => {
+    const res = await request(app)
+      .post('/test')
+      .send({ ...validStoreBody, description: 'A'.repeat(1001) });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects an invalid logo URL', async () => {
+    const res = await request(app).post('/test').send({ ...validStoreBody, logoUrl: 'not-a-url' });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects more than 10 categories', async () => {
+    const res = await request(app)
+      .post('/test')
+      .send({ ...validStoreBody, categories: Array.from({ length: 11 }, (_, i) => `Category ${i}`) });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a category that is an empty string', async () => {
+    const res = await request(app).post('/test').send({ ...validStoreBody, categories: [''] });
+    expect(res.status).toBe(400);
+  });
+});
+
+describe('updateStoreValidator', () => {
+  function buildUpdateTestApp() {
+    const app = express();
+    app.use(express.json());
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    app.patch('/test/:id', ...(updateStoreValidator as any), (_req: express.Request, res: express.Response) => {
+      res.status(200).json({ success: true });
+    });
+    app.use(globalErrorHandler);
+    return app;
+  }
+  const app = buildUpdateTestApp();
+  const storeId = 'a1b2c3d4-e5f6-4a1b-8c2d-3e4f5a6b7c8d';
+
+  it('accepts a partial update with just one profile field', async () => {
+    const res = await request(app).patch(`/test/${storeId}`).send({ phone: '+1-555-0100' });
+    expect(res.status).toBe(200);
+  });
+
+  it('accepts an empty body (no-op update)', async () => {
+    const res = await request(app).patch(`/test/${storeId}`).send({});
+    expect(res.status).toBe(200);
+  });
+
+  it('rejects an invalid services entry type', async () => {
+    const res = await request(app)
+      .patch(`/test/${storeId}`)
+      .send({ services: ['Valid Service', 123] });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a non-UUID id in the URL', async () => {
+    const res = await request(app).patch('/test/not-a-uuid').send({ phone: '+1-555-0100' });
     expect(res.status).toBe(400);
   });
 });
