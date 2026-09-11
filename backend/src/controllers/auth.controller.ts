@@ -22,11 +22,6 @@ export const refresh = catchAsync(async (req: AuthRequest, res: Response) => {
 });
 
 export const logout = catchAsync(async (_req: AuthRequest, res: Response) => {
-  // JWTs are stateless and no server-side session/refresh-token store exists
-  // in the schema, so logout is a client-side action (discard both tokens).
-  // This endpoint exists so the frontend has a single, consistent call to
-  // make and so a future token-blacklist can be added here without changing
-  // the API contract.
   sendSuccess(res, 200, 'Logged out successfully.');
 });
 

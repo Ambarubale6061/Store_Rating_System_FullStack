@@ -16,9 +16,7 @@ async function main() {
     process.env.SEED_ADMIN_ADDRESS ??
     'Head Office, Corporate Park, Business District, Mumbai, Maharashtra, India';
 
-  // Guard against seeding with values that would fail our own validation rules
-  // (name 20-60 chars, address <=400 chars) so the seed never produces a
-  // row the app itself would consider invalid.
+  // Guard against seeding with values that would fail our validation rules
   if (adminName.length < 20 || adminName.length > 60) {
     throw new Error('SEED_ADMIN_NAME must be between 20 and 60 characters.');
   }
@@ -26,17 +24,18 @@ async function main() {
     throw new Error('SEED_ADMIN_ADDRESS must be at most 400 characters.');
   }
 
-  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
-
-  if (existingAdmin) {
-    console.log(`Seed skipped: admin account already exists (${adminEmail}).`);
-    return;
-  }
-
   const hashedPassword = await bcrypt.hash(adminPassword, SALT_ROUNDS);
 
-  const admin = await prisma.user.create({
-    data: {
+  // upsert वापरल्याने जुना अकाऊंट असल्यास त्याचा रोल बदलून ADMIN होईल
+  const admin = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      role: Role.ADMIN,
+      password: hashedPassword,
+      name: adminName,
+      address: adminAddress,
+    },
+    create: {
       name: adminName,
       email: adminEmail,
       password: hashedPassword,
@@ -45,7 +44,7 @@ async function main() {
     },
   });
 
-  console.log('Seed complete. Admin account created:');
+  console.log('✅ Seed complete. Admin account created/updated:');
   console.log(`  id:    ${admin.id}`);
   console.log(`  email: ${admin.email}`);
   console.log(`  role:  ${admin.role}`);
