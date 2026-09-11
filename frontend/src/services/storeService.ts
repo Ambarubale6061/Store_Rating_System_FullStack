@@ -1,6 +1,6 @@
 import { apiClient } from './apiClient';
 import type { ApiMeta, ApiSuccess } from '@/types/api.types';
-import type { CreateStorePayload, Store } from '@/types/store.types';
+import type { CreateStorePayload, Store, UpdateStorePayload } from '@/types/store.types';
 
 export interface ListStoresParams {
   page?: number;
@@ -23,6 +23,11 @@ export const storeService = {
 
   async getById(id: string): Promise<Store> {
     const res = await apiClient.get<ApiSuccess<Store>>(`/stores/${id}`);
+    return res.data.data;
+  },
+
+  async update(id: string, payload: UpdateStorePayload): Promise<Store> {
+    const res = await apiClient.patch<ApiSuccess<Store>>(`/stores/${id}`, payload);
     return res.data.data;
   },
 };
