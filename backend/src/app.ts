@@ -7,18 +7,30 @@ import xssClean from 'xss-clean';
 import 'express-async-errors';
 
 import { env } from './config/env';
+import { AppError } from './utils/AppError';
 import { globalErrorHandler, notFoundHandler } from './middlewares/errorHandler';
 import { sendSuccess } from './utils/ApiResponse';
 import apiRoutes from './routes';
 
 export function createApp(): Application {
   const app = express();
+  if (env.isProduction) {
+    app.set('trust proxy', env.trustProxyHops);
+  }
 
   // --- Security middleware ---
   app.use(helmet());
   app.use(
     cors({
-      origin: env.clientUrl,
+      origin(origin, callback) {
+        if (!origin) return callback(null, true);
+
+        if (env.clientUrls.includes(origin)) {
+          return callback(null, true);
+        }
+
+        callback(AppError.forbidden(`Origin "${origin}" is not allowed by CORS policy.`));
+      },
       credentials: true,
     })
   );
@@ -47,6 +59,7 @@ export function createApp(): Application {
     sendSuccess(res, 200, 'Store Rating System API is healthy', {
       timestamp: new Date().toISOString(),
       environment: env.nodeEnv,
+      allowedOrigins: env.clientUrls,
     });
   });
 

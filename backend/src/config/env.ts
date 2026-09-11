@@ -13,7 +13,14 @@ function requireEnv(key: string, fallback?: string): string {
 export const env = {
   nodeEnv: requireEnv('NODE_ENV', 'development'),
   port: parseInt(requireEnv('PORT', '5000'), 10),
-  clientUrl: requireEnv('CLIENT_URL', 'http://localhost:5173'),
+
+  clientUrls: requireEnv('CLIENT_URL', 'http://localhost:5173')
+    .split(',')
+    .map((url) => url.trim())
+    .filter(Boolean),
+
+
+  trustProxyHops: parseInt(requireEnv('TRUST_PROXY_HOPS', '1'), 10),
 
   databaseUrl: requireEnv('DATABASE_URL', ''),
 
