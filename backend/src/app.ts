@@ -14,8 +14,12 @@ import apiRoutes from './routes';
 
 export function createApp(): Application {
   const app = express();
+
+  // Render / Cloud Hosting साठी trust proxy 1 सेट करणे आवश्यक आहे
   if (env.isProduction) {
-    app.set('trust proxy', env.trustProxyHops);
+    app.set('trust proxy', 1);
+  } else {
+    app.set('trust proxy', env.trustProxyHops || 1);
   }
 
   // --- Security middleware ---
@@ -34,6 +38,7 @@ export function createApp(): Application {
       credentials: true,
     })
   );
+
   app.use(
     rateLimit({
       windowMs: env.rateLimit.windowMs,
