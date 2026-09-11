@@ -16,6 +16,7 @@ import { extractErrorMessage } from '@/services/apiClient';
 import type { Store } from '@/types/store.types';
 import type { AdminUser } from '@/types/user.types';
 import type { CreateStoreFormValues } from '@/utils/validationSchemas';
+import { toStoreProfilePayload } from '@/utils/storeProfile';
 
 export function AdminStoresPage() {
   const [stores, setStores] = useState<Store[]>([]);
@@ -83,7 +84,13 @@ export function AdminStoresPage() {
 
   const handleCreate = async (values: CreateStoreFormValues) => {
     try {
-      await storeService.create(values);
+      await storeService.create({
+        name: values.name,
+        email: values.email,
+        address: values.address,
+        ownerId: values.ownerId,
+        ...toStoreProfilePayload(values),
+      });
       toast.success('Store created successfully.');
       setIsModalOpen(false);
       load();
