@@ -33,7 +33,6 @@ export function AdminUserDetailPage() {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   return (
