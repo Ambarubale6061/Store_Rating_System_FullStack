@@ -24,10 +24,6 @@ export function LoginForm() {
     setIsSubmitting(true);
     try {
       await login(values);
-      // If the user was redirected here from a protected route (e.g. typed
-      // a dashboard URL directly while signed out), send them back there
-      // instead of always dropping them on "/". Only ever a same-app path
-      // supplied by our own ProtectedRoute — never an external URL.
       const from = (location.state as { from?: { pathname: string; search?: string } })?.from;
       navigate(from ? `${from.pathname}${from.search ?? ''}` : '/', { replace: true });
     } catch {
