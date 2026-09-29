@@ -3,12 +3,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { PageLoader } from '@/components/common/PageLoader';
 import { LandingPage } from './LandingPage';
 
-/**
- * Root route ("/"). Signed-in visitors are sent straight to their role's
- * dashboard; everyone else sees the public marketing landing page. This
- * only decides what renders at "/" — it doesn't change how login/signup/
- * protected routes work anywhere else in the app.
- */
 export function HomePage() {
   const { user, isLoading } = useAuth();
 
