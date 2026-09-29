@@ -25,7 +25,7 @@ export function SignupForm() {
       await signup(values);
       navigate('/', { replace: true });
     } catch {
-      // Error toast already shown by AuthContext.
+      
     } finally {
       setIsSubmitting(false);
     }
