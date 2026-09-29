@@ -112,9 +112,6 @@ export function StoreDetailPage() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [logoFailed, setLogoFailed] = useState(false);
 
-  // Only a USER account can submit a rating (matches the backend's
-  // POST /ratings authorization, which is USER-only) — Admins and Store
-  // Owners viewing this same profile see the rating summary read-only.
   const canRate = user?.role === 'USER';
   // Only ADMIN can edit a store's profile (matches the backend's
   // PATCH /stores/:id authorization, which is ADMIN-only).
