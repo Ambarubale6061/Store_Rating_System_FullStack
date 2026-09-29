@@ -56,7 +56,6 @@ export function AdminStoresPage() {
       const { users } = await userService.list({ role: 'STORE_OWNER', limit: 100 });
       setStoreOwners(users);
     } catch {
-      // Non-fatal — the store form will just show "no owners" until this succeeds.
     }
   }, []);
 
