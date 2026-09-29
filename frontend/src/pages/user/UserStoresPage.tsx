@@ -52,7 +52,7 @@ export function UserStoresPage() {
   }, [debouncedSearch]);
 
   const handleSortChange = (columnId: string) => {
-    if (columnId === 'myRating') return; // not sortable server-side
+    if (columnId === 'myRating') return;
     if (sortBy === columnId) {
       setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
